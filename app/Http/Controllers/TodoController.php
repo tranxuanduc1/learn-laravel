@@ -3,28 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Todo;
-
+use App\Http\Requests\StoreTodoRequest;
+use App\Http\Resources\TodoResource;
+use App\Services\TodoService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class TodoController extends Controller
 {
-    public function index()
+    public function __construct(
+        private readonly TodoService $todoService,
+    ) {
+    }
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $todos = Todo::all();
+        $todos = $this->todoService->list(
+            $request->user(),
+        );
 
-        return response()->json($todos);
+        return TodoResource::collection($todos);
     }
 
-    public function store(Request $request)
+    public function store(StoreTodoRequest $request): TodoResource
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-        ]);
+        $todo = $this->todoService->create(
+            $request->user(),
+            $request->validated(),
+        );
 
-        $todo = Todo::create([
-            'title' => $data['title'],
-            'completed' => false,
-        ]);
-
-        return response()->json($todo, 201);
+        return new TodoResource($todo);
     }
 }
