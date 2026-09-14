@@ -25,4 +25,19 @@ class TodoService implements TodoServiceInterface
             'completed' => false,
         ]);
     }
+
+    public function update(Todo $todo, array $data): Todo
+    {
+        $todo->update([
+            'title' => $data['title'],
+            'completed' => $data['completed'],
+        ]);
+
+        return $todo->refresh();
+    }
+
+    public function delete(Todo $todo): void
+    {
+        $todo->delete();
+    }
 }

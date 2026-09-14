@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Todo;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class StoreTodoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Todo::class) ?? false;
     }
 
     /**
