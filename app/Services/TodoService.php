@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use App\Contracts\TodoServiceInterface;
 use App\Models\Todo;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
-class TodoService
+class TodoService implements TodoServiceInterface
 {
     public function list(User $user): Collection
     {

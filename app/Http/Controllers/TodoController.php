@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\TodoServiceInterface;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreTodoRequest;
 use App\Http\Resources\TodoResource;
-use App\Services\TodoService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class TodoController extends Controller
 {
     public function __construct(
-        private readonly TodoService $todoService,
+        private readonly TodoServiceInterface $todoService,
     ) {
     }
     public function index(Request $request): AnonymousResourceCollection
