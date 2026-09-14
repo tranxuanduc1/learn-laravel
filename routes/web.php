@@ -16,5 +16,6 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
     Route::get('/todos', [WebTodoController::class, 'index'])->name('todos.index');
+    Route::get('/todos/data', [WebTodoController::class, 'data'])->name('todos.data');
     Route::post('/logout', [WebAuthController::class, 'destroy'])->name('logout');
 });

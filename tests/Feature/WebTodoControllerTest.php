@@ -17,7 +17,31 @@ class WebTodoControllerTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
-    public function test_user_only_sees_their_own_todos(): void
+    public function test_todo_page_is_a_blade_shell_without_todo_data(): void
+    {
+        $user = User::factory()->create();
+
+        Todo::query()->create([
+            'user_id' => $user->id,
+            'title' => 'My private todo',
+            'completed' => false,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('todos.index'))
+            ->assertOk()
+            ->assertViewIs('todos.index')
+            ->assertSee('Loading todos...')
+            ->assertDontSee('My private todo');
+    }
+
+    public function test_guest_cannot_access_todo_data_endpoint(): void
+    {
+        $this->getJson(route('todos.data'))
+            ->assertUnauthorized();
+    }
+
+    public function test_todo_data_endpoint_only_returns_the_authenticated_users_todos(): void
     {
         $user = User::factory()->create();
         $otherUser = User::factory()->create();
@@ -30,24 +54,25 @@ class WebTodoControllerTest extends TestCase
         Todo::query()->create([
             'user_id' => $otherUser->id,
             'title' => 'Another user private todo',
-            'completed' => false,
+            'completed' => true,
         ]);
 
         $this->actingAs($user)
-            ->get(route('todos.index'))
+            ->getJson(route('todos.data'))
             ->assertOk()
-            ->assertViewIs('todos.index')
-            ->assertSee('My private todo')
-            ->assertDontSee('Another user private todo');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'My private todo')
+            ->assertJsonPath('data.0.completed', false)
+            ->assertJsonMissing(['title' => 'Another user private todo']);
     }
 
-    public function test_user_sees_an_empty_state_when_they_have_no_todos(): void
+    public function test_todo_data_endpoint_returns_an_empty_collection(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->get(route('todos.index'))
+            ->getJson(route('todos.data'))
             ->assertOk()
-            ->assertSee('You do not have any todos yet.');
+            ->assertExactJson(['data' => []]);
     }
 }
