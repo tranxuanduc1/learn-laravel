@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Todo;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -12,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->updateOrCreate(
+        $admin = User::query()->updateOrCreate(
             [
                 'email' => env('DEFAULT_USER_EMAIL', 'admin@example.com'),
             ],
@@ -22,5 +23,17 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ],
         );
+
+        foreach (range(1, 10) as $number) {
+            Todo::query()->updateOrCreate(
+                [
+                    'user_id' => $admin->id,
+                    'title' => "Todo {$number}",
+                ],
+                [
+                    'completed' => false,
+                ],
+            );
+        }
     }
 }

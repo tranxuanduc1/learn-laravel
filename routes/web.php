@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\WebAuthController;
+use App\Http\Controllers\WebTodoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,5 +15,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/todos', [WebTodoController::class, 'index'])->name('todos.index');
     Route::post('/logout', [WebAuthController::class, 'destroy'])->name('logout');
 });
